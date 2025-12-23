@@ -1,0 +1,38 @@
+# dbt_transformation/models/staging/stg_big_star_db.yml
+
+version: 2
+
+models:
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer."
+        tests:
+          - unique
+          - not_null
+  - name: stg_orders
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - unique
+          - not_null
+      - name: order_status
+        description: "Current status of the order. It gets updated as the order progresses through different stages."
+        tests:
+          - accepted_values:
+              values:
+                - created
+                - shipped
+                - approved
+                - canceled
+                - invoiced
+                - delivered
+                - processing
+                - unavailable
+      - name: customer_id
+        description: "Identifier for the customer who placed the order. It holds a reference to the stg_customers model"
+        tests:
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
